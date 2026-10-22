@@ -39,11 +39,11 @@ Ce fichier sert de référence complète et d'instructions directes pour **Claud
 ├── eslint.config.js              # ESLint (typescript-eslint, react-hooks)
 ├── pwa-assets.config.ts          # Génération des icônes à partir de public/icon.svg
 ├── public/
-│   ├── icon.svg                  # Icône source (bouclier secours rouge/or)
+│   ├── icon.svg                  # Icône source, ronde (bouclier secours rouge/or)
 │   ├── favicon.ico
 │   ├── apple-touch-icon.png      # 180x180 pour iOS Safari
 │   ├── pwa-64x64.png / pwa-192x192.png / pwa-512x512.png
-│   └── maskable-icon-512x512.png # Icône masquable avec zone de sécurité
+│   └── maskable-icon-512x512.png # Icône masquable Android, rouge jusqu’au bord (aucun fond blanc)
 └── src/
     ├── main.tsx                  # Montage React + enregistrement du Service Worker
     ├── index.css                 # Import global Tailwind CSS
