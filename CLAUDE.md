@@ -145,10 +145,12 @@ Recherche web du 18/10/2026. **Tous les numéros restent « Non vérifié »** j
 6. **Gendarmerie** : 800 00 20 20 (⚠ selon une source, numéro VBG) / +221 33 991 11 12
 7. **Senelec** : +221 33 867 66 66 / 30 100 66 66 / agence 33 991 12 21
 8. **SEN'EAU** : 800 00 11 11 / 33 839 37 54 / WhatsApp : +221 78 935 51 51
+9g. **Service National de l’Hygiène** (catégorie « Administration », plus code HP69+5R4) : +221 33 991 11 48 (fiche Google Maps)
 9. **Mairie de Ziguinchor** (catégorie « Administration », bouton d’appel bleu) : +221 33 991 10 65 / 33 991 11 65 (aucune source en ligne)
 9b. **Dentistes** (catégorie « Dentistes », bouton turquoise) : Clinique Dentaire La Casamance (Cité Biagui 1) : +221 33 991 76 39 / 77 615 40 59 ; Cabinet Dr Mangane (Rue du Général de Gaulle) : aucun numéro ; Dental Castor : +221 77 266 16 74
 9c. **Cabinets médicaux** (catégorie « Cabinets médicaux », bouton violet) : Cabinet médical Dr Simon Tendeng (Av. Gabriel Carvalho) : +221 33 991 13 85 ; Cabinet Médical Néma : 33 991 15 91 / 76 244 45 54 ; Dr Fatou Bintou Diouf (Rue Javelier) : 33 991 15 80 ; Le Souffle (Yamatogne) : 33 990 29 72 / 77 498 11 15
 9e. **Soins paramédicaux** (catégorie « Soins paramédicaux », bouton vert citron) : Aris Badji (Castors) : 76 180 54 13 / 77 658 08 07 ; Assontena : 76 288 51 80 / 77 058 41 12
+9f. **CCA, Centre Conseil pour Adolescents et Jeunes** (catégorie « Santé », Escale) : +221 77 640 82 37, gratuit, santé reproductive / mentale, violences (source : carterosesenegal.com)
 9d. **Casa Urgences, plateau médical** (catégorie « Santé », marqué Urgence) : +221 33 991 53 28, à vérifier en priorité
 10. **Pharmacies** : Alexandre Diadhiou, Rond Point, Léona, Colobane, de la Paix, Goumel, Boucotte, Néma, Tilène, Santhiaba, de l’Est, du Sud (numéros d'annuaires) ; du Stade, Soucoupapaye, de Kénia sans numéro. Koldoise et Kaoussoulaye retirées (elles sont à Kolda).
 
