@@ -4,12 +4,14 @@ import type { Translations } from '../data/translations';
 
 interface Props {
   t: Translations;
-  onExport: () => void;
+  /** Admin: all contacts, import mode choice and reset. Otherwise: backup and restore of personal contacts only. */
+  admin: boolean;
+  onExport: () => Promise<number>;
   onImport: (file: File, merge: boolean) => Promise<number>;
   onReset: () => void;
 }
 
-export function DataMenu({ t, onExport, onImport, onReset }: Props) {
+export function DataMenu({ t, admin, onExport, onImport, onReset }: Props) {
   const [open, setOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -17,7 +19,7 @@ export function DataMenu({ t, onExport, onImport, onReset }: Props) {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    const merge = window.confirm(t.importMode);
+    const merge = admin ? window.confirm(t.importMode) : true;
     try {
       const n = await onImport(file, merge);
       window.alert(`${t.importOk} (${n})`);
@@ -40,21 +42,29 @@ export function DataMenu({ t, onExport, onImport, onReset }: Props) {
       </button>
       {open && (
         <div className="absolute right-0 z-30 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-          <button className={item} onClick={() => { onExport(); setOpen(false); }}>
-            <FileDown size={16} /> {t.exportData}
-          </button>
-          <button className={item} onClick={() => fileRef.current?.click()}>
-            <FileUp size={16} /> {t.importData}
-          </button>
           <button
-            className={`${item} text-red-700`}
-            onClick={() => {
-              if (window.confirm(t.confirmReset)) onReset();
+            className={item}
+            onClick={async () => {
               setOpen(false);
+              if ((await onExport()) === 0) window.alert(t.noPersonal);
             }}
           >
-            <RotateCcw size={16} /> {t.resetData}
+            <FileDown size={16} /> {admin ? t.exportData : t.backupMine}
           </button>
+          <button className={item} onClick={() => fileRef.current?.click()}>
+            <FileUp size={16} /> {admin ? t.importData : t.restoreMine}
+          </button>
+          {admin && (
+            <button
+              className={`${item} text-red-700`}
+              onClick={() => {
+                if (window.confirm(t.confirmReset)) onReset();
+                setOpen(false);
+              }}
+            >
+              <RotateCcw size={16} /> {t.resetData}
+            </button>
+          )}
           <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={handleFile} />
         </div>
       )}

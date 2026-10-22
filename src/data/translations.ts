@@ -51,6 +51,21 @@ const fr = {
   reportComment: 'Remarque (facultatif)',
   reportSend: 'Envoyer',
   careFields: 'Soins',
+  myContact: 'Mon contact',
+  myContacts: 'Mes contacts',
+  addTitle: 'Ajouter un contact',
+  addPersonal: 'Ajouter à mes contacts',
+  addPersonalHint: 'Visible seulement sur ce téléphone (médecin de famille, proches…).',
+  suggestContact: 'Proposer un contact pour tous',
+  suggestContactHint: 'Votre proposition sera envoyée par WhatsApp et ajoutée pour tous après vérification.',
+  suggestName: 'Nom',
+  suggestPhone: 'Numéro',
+  suggestPlace: 'Quartier / adresse',
+  adminMode: 'Mode gestion actif : les contacts officiels sont modifiables sur cet appareil.',
+  adminExit: 'Quitter',
+  backupMine: 'Sauvegarder mes contacts',
+  restoreMine: 'Importer mes contacts',
+  noPersonal: 'Vous n’avez pas encore de contact personnel à sauvegarder.',
 };
 
 export type Translations = typeof fr;
@@ -105,6 +120,21 @@ const wo: Translations = {
   reportComment: 'Leeral (bu la neexee)',
   reportSend: 'Yónnee',
   careFields: 'Fajkat',
+  myContact: 'Sama nimero',
+  myContacts: 'Samay nimero',
+  addTitle: 'Yokk nimero',
+  addPersonal: 'Yokk ci samay nimero',
+  addPersonalHint: 'Ci telefon bii rekk lay feeñ (sa doktoor, sa mbokk…).',
+  suggestContact: 'Joxe nimero ngir ñépp',
+  suggestContactHint: 'Dinañu ko yónnee ci WhatsApp, te dinañu ko yokk ngir ñépp su ñu ko seetee.',
+  suggestName: 'Tur',
+  suggestPhone: 'Nimero',
+  suggestPlace: 'Gox / adrees',
+  adminMode: 'Mode gestion : nimero yu officiel yi, ci appareil bii rekk lañuy soppiku.',
+  adminExit: 'Génn',
+  backupMine: 'Denc samay nimero',
+  restoreMine: 'Dugal samay nimero',
+  noPersonal: 'Amoo benn sa nimero bu ñuy denc.',
 };
 
 export const TRANSLATIONS: Record<Lang, Translations> = { fr, wo };

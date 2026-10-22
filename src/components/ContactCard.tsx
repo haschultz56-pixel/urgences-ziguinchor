@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, Globe, House, MapPin, MessageCircle, MessageSquareWarning, Pencil, Phone, Trash2, User, AlertTriangle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Globe, House, MapPin, MessageCircle, MessageSquareWarning, Pencil, Phone, Trash2, User, UserRound, AlertTriangle } from 'lucide-react';
 import type { EmergencyContact, Lang } from '../types';
 import type { Translations } from '../data/translations';
 import { categoryById } from '../data/categories';
@@ -10,13 +10,17 @@ interface Props {
   contact: EmergencyContact;
   lang: Lang;
   t: Translations;
+  /** The user's own contact, stored on this device only: no "unverified" badge, no report button */
+  personal: boolean;
+  /** Edit and delete buttons: personal contacts, or every contact in admin mode */
+  canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }
 
 const waLink = (num: string) => `https://wa.me/${num.replace(/\D/g, '')}`;
 
-export function ContactCard({ contact: c, lang, t, onEdit, onDelete }: Props) {
+export function ContactCard({ contact: c, lang, t, personal, canEdit, onEdit, onDelete }: Props) {
   const [open, setOpen] = useState(false);
   const [report, setReport] = useState<ReportTarget | null>(null);
   const cat = categoryById(c.category);
@@ -59,21 +63,28 @@ export function ContactCard({ contact: c, lang, t, onEdit, onDelete }: Props) {
                 <House size={11} /> {c.homeVisits ? t.homeVisitsYes : t.homeVisitsNo}
               </span>
             )}
-            {!c.verified && (
+            {personal && (
+              <span className="flex items-center gap-0.5 rounded bg-blue-100 px-1.5 py-0.5 text-blue-800">
+                <UserRound size={11} /> {t.myContact}
+              </span>
+            )}
+            {!personal && !c.verified && (
               <span className="flex items-center gap-0.5 rounded bg-amber-100 px-1.5 py-0.5 text-amber-800">
                 <AlertTriangle size={11} /> {t.unverified}
               </span>
             )}
           </div>
         </div>
-        <div className="flex shrink-0 gap-1">
-          <button onClick={onEdit} aria-label={t.edit} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100">
-            <Pencil size={18} />
-          </button>
-          <button onClick={onDelete} aria-label={t.delete} className="rounded-lg p-2 text-slate-500 hover:bg-red-50 hover:text-red-700">
-            <Trash2 size={18} />
-          </button>
-        </div>
+        {canEdit && (
+          <div className="flex shrink-0 gap-1">
+            <button onClick={onEdit} aria-label={t.edit} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100">
+              <Pencil size={18} />
+            </button>
+            <button onClick={onDelete} aria-label={t.delete} className="rounded-lg p-2 text-slate-500 hover:bg-red-50 hover:text-red-700">
+              <Trash2 size={18} />
+            </button>
+          </div>
+        )}
       </div>
 
       {description && <p className="mt-2 text-sm text-slate-600">{description}</p>}
@@ -97,24 +108,28 @@ export function ContactCard({ contact: c, lang, t, onEdit, onDelete }: Props) {
             >
               <Phone size={18} /> {t.call} {c.phone}
             </a>
-            <button
-              type="button"
-              onClick={() => setReport({ label: 'Numéro principal', phone: c.phone })}
-              aria-label={t.reportNumber}
-              title={t.reportNumber}
-              className="shrink-0 rounded-xl border border-amber-200 px-3 text-amber-600 hover:bg-amber-50"
-            >
-              <MessageSquareWarning size={20} />
-            </button>
+            {!personal && (
+              <button
+                type="button"
+                onClick={() => setReport({ label: 'Numéro principal', phone: c.phone })}
+                aria-label={t.reportNumber}
+                title={t.reportNumber}
+                className="shrink-0 rounded-xl border border-amber-200 px-3 text-amber-600 hover:bg-amber-50"
+              >
+                <MessageSquareWarning size={20} />
+              </button>
+            )}
           </>
         ) : (
-          <button
-            type="button"
-            onClick={() => setReport({ label: 'Numéro principal', phone: '' })}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-dashed border-amber-300 px-4 py-3 text-sm font-semibold text-amber-700 hover:bg-amber-50"
-          >
-            <MessageSquareWarning size={18} /> {t.suggestNumber}
-          </button>
+          !personal && (
+            <button
+              type="button"
+              onClick={() => setReport({ label: 'Numéro principal', phone: '' })}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-dashed border-amber-300 px-4 py-3 text-sm font-semibold text-amber-700 hover:bg-amber-50"
+            >
+              <MessageSquareWarning size={18} /> {t.suggestNumber}
+            </button>
+          )
         )}
         {c.whatsapp && (
           <a

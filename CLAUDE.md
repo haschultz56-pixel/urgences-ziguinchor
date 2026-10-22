@@ -54,13 +54,15 @@ Ce fichier sert de référence complète et d'instructions directes pour **Claud
     ├── data/tags.ts              # Domaines de soins (tags transversaux, ex. Maternité)
     ├── data/translations.ts      # Dictionnaire bilingue Français / Wolof
     ├── hooks/useContacts.ts      # CRUD + persistance localStorage + import/export JSON
+    ├── hooks/useAdminMode.ts     # Mode gestion (?admin=1 / ?admin=0), par appareil
     ├── hooks/usePWAInstall.ts    # Détection de l'installabilité PWA (Chrome + iOS)
     ├── hooks/useOnlineStatus.ts  # Surveillance du statut réseau / hors-ligne
     └── components/
         ├── Header.tsx            # En-tête, commutateur FR/WO, bouton d'installation
         ├── ContactCard.tsx       # Carte contact (appel, WhatsApp, services dépliables)
         ├── ContactForm.tsx       # Formulaire création / modification
-        ├── DataMenu.tsx          # Export, import, restauration des données
+        ├── DataMenu.tsx          # Export, import, restauration des données (mode gestion)
+        ├── AddContactDialog.tsx  # « Ajouter » : contact personnel ou proposition par WhatsApp
         └── ReportNumberDialog.tsx # Signalement d’un numéro erroné par WhatsApp
 ```
 
@@ -70,14 +72,16 @@ Pour régénérer les icônes après modification de `public/icon.svg` : `npm ru
 
 ## 3b. Gestion des Données (CRUD)
 
-* Au premier lancement, `DEFAULT_CONTACTS` (`src/data/contacts.ts`) est copié dans `localStorage` (clé `uz.contacts.v1`). Les contacts ajoutés plus tard au seed (nouvel `id`) sont ajoutés automatiquement au prochain chargement. Les ids déjà vus sont mémorisés dans `uz.seedIds.v1`, donc un contact supprimé ne revient pas, et un contact existant modifié dans le seed n’est pas mis à jour. Ensuite, **toutes les modifications se font dans l'application** : bouton « Ajouter », icônes crayon (modifier) et corbeille (supprimer).
+* **Contacts officiels** = ceux dont l’`id` figure dans `DEFAULT_CONTACTS` (`src/data/contacts.ts`, `isOfficial` dans `useContacts.ts`). **Contacts personnels** = tous les autres, créés par l’utilisateur et gardés seulement sur son appareil (badge bleu « Mon contact », filtre « Mes contacts », ni badge « Non vérifié » ni bouton de signalement).
+* **Utilisateurs normaux** : les contacts officiels sont toujours repris du seed à chaque chargement, donc **toute modification du seed (nouveaux contacts, corrections, tags) arrive chez tous les utilisateurs** après redéploiement. Ils ne peuvent ni modifier ni supprimer les contacts officiels (pas de crayon ni de corbeille), et le menu « Données » est masqué. Le bouton « Ajouter » propose : ajouter à mes contacts (formulaire, local) ou **proposer un contact pour tous** (nom, numéro, quartier, remarque), envoyé par WhatsApp à `REPORT_WHATSAPP` avec un message en français.
+* **Mode gestion** (mainteneur) : `https://urgences-ziguinchor.org/?admin=1` l’active sur l’appareil (clé `uz.admin`), `?admin=0` ou le bouton « Quitter » du bandeau noir le désactive. Ce n’est pas une protection (n’importe qui connaissant le lien peut l’activer, mais seulement chez lui). En mode gestion, tout est modifiable et le menu « Données » est visible ; les contacts officiels sont alors lus depuis `localStorage` (clé `uz.contacts.v1`) : les contacts ajoutés au seed arrivent automatiquement, les ids déjà vus sont mémorisés dans `uz.seedIds.v1` (un contact supprimé ne revient pas, un contact modifié dans le seed n’est pas mis à jour). **En quittant le mode gestion, les modifications locales des contacts officiels sont remplacées par le seed** : exporter avant.
 * Chaque contact peut contenir des numéros secondaires et des **services (départements)** avec téléphone, poste, interlocuteur et description.
 * `phoneRaw` est calculé automatiquement à partir de `phone` (`toPhoneRaw`).
 * Le champ `verified` signale les numéros confirmés ; sinon la carte affiche « Non vérifié ».
 * Menu « Données » : **export JSON** (sauvegarde / partage entre appareils), **import JSON** (fusion par `id` ou remplacement complet), **restauration** des données d'origine.
-* Les données sont propres à chaque appareil et navigateur. Pour diffuser une liste mise à jour à tous les utilisateurs, intégrer le JSON exporté dans `src/data/contacts.ts` et redéployer (les nouveaux contacts arrivent chez tous les utilisateurs ; les modifications de contacts existants n’arrivent qu’aux nouveaux utilisateurs ou après une restauration).
+* Les données sont propres à chaque appareil et navigateur. Pour diffuser une liste mise à jour à tous les utilisateurs, intégrer le JSON exporté dans `src/data/contacts.ts` (avec des `id` lisibles) et redéployer.
 
-* **Domaines de soins (tags)** : en plus de sa catégorie, un contact peut porter des tags (`tags`, définis dans `src/data/tags.ts`, type `TagId`). Ils s’affichent en badge rose sur la carte, se cochent dans le formulaire et forment une ligne de filtres « Soins » sous les catégories. Tags actuels : Maternité, Pédiatrie, Vaccination, Paludisme / Fièvre. Pour ajouter un tag : l’ajouter à `TagId` et à `TAGS`. Comme pour les autres champs, un tag ajouté dans le seed à un contact existant n’arrive pas chez les utilisateurs qui ont déjà ce contact.
+* **Domaines de soins (tags)** : en plus de sa catégorie, un contact peut porter des tags (`tags`, définis dans `src/data/tags.ts`, type `TagId`). Ils s’affichent en badge rose sur la carte, se cochent dans le formulaire et forment une ligne de filtres « Soins » sous les catégories. Tags actuels : Maternité, Pédiatrie, Vaccination, Paludisme / Fièvre. Pour ajouter un tag : l’ajouter à `TagId` et à `TAGS`. Un tag ajouté dans le seed arrive chez tous les utilisateurs (sauf sur un appareil en mode gestion).
 * **Signalement des numéros erronés** : uniquement à côté du numéro principal (les numéros secondaires et postes s’obtiennent via le standard), une icône ambre (`MessageSquareWarning`) ouvre un petit formulaire (numéro correct + remarque). Un contact sans numéro principal affiche à la place « Proposer un numéro », qui disparaît dès qu’un numéro est saisi. L’envoi ouvre WhatsApp vers `REPORT_WHATSAPP` (+221 78 431 02 51, dans `ReportNumberDialog.tsx`) avec un message en français pré-rempli (nom, id du contact, numéro concerné, numéro proposé). La correction se fait ensuite à la main dans `src/data/contacts.ts`.
 
 ---

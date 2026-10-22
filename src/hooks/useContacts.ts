@@ -5,6 +5,11 @@ import type { EmergencyContact } from '../types';
 const STORAGE_KEY = 'uz.contacts.v1';
 const SEEN_SEED_KEY = 'uz.seedIds.v1';
 
+const SEED_IDS = new Set(DEFAULT_CONTACTS.map((c) => c.id));
+
+/** Official contacts come from the seed; all others are the user's own, kept on this device only. */
+export const isOfficial = (c: EmergencyContact): boolean => SEED_IDS.has(c.id);
+
 /** Appends seed contacts added since the last visit; seeds the user deleted are not restored. */
 function withNewSeeds(stored: EmergencyContact[]): EmergencyContact[] {
   const seenRaw = localStorage.getItem(SEEN_SEED_KEY);
@@ -14,12 +19,20 @@ function withNewSeeds(stored: EmergencyContact[]): EmergencyContact[] {
   return added.length ? [...stored, ...structuredClone(added)] : stored;
 }
 
-function load(): EmergencyContact[] {
+/**
+ * Admin mode keeps the stored official contacts (with local edits and deletions).
+ * Otherwise official contacts are always taken fresh from the seed, so corrections reach every user.
+ */
+function load(admin: boolean): EmergencyContact[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return withNewSeeds(parsed);
+      if (Array.isArray(parsed)) {
+        if (admin) return withNewSeeds(parsed);
+        localStorage.setItem(SEEN_SEED_KEY, JSON.stringify([...SEED_IDS]));
+        return [...structuredClone(DEFAULT_CONTACTS), ...parsed.filter((c: EmergencyContact) => !isOfficial(c))];
+      }
     }
     localStorage.setItem(SEEN_SEED_KEY, JSON.stringify(DEFAULT_CONTACTS.map((c) => c.id)));
   } catch {
@@ -46,8 +59,8 @@ function isContact(c: unknown): c is EmergencyContact {
   return !!o && typeof o.id === 'string' && typeof o.nameFr === 'string' && typeof o.category === 'string';
 }
 
-export function useContacts() {
-  const [contacts, setContacts] = useState<EmergencyContact[]>(load);
+export function useContacts(admin: boolean) {
+  const [contacts, setContacts] = useState<EmergencyContact[]>(() => load(admin));
 
   useEffect(() => {
     try {
@@ -58,6 +71,8 @@ export function useContacts() {
   }, [contacts]);
 
   const save = useCallback((contact: EmergencyContact) => {
+    // Ask the browser not to evict storage once the user owns data that exists nowhere else.
+    if (!isOfficial(contact)) void navigator.storage?.persist?.().catch(() => false);
     const stamped = { ...contact, updatedAt: new Date().toISOString() };
     setContacts((prev) =>
       prev.some((c) => c.id === stamped.id)
@@ -72,20 +87,44 @@ export function useContacts() {
 
   const reset = useCallback(() => setContacts(structuredClone(DEFAULT_CONTACTS)), []);
 
-  const exportJson = useCallback(() => {
-    const blob = new Blob([JSON.stringify(contacts, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+  /**
+   * Admin: downloads every contact. Otherwise: only the personal contacts, through the share sheet
+   * when available (e.g. to send the file to oneself on WhatsApp). Returns the number exported.
+   */
+  const exportJson = useCallback(async (): Promise<number> => {
+    const list = admin ? contacts : contacts.filter((c) => !isOfficial(c));
+    if (!list.length) return 0;
+    const date = new Date().toISOString().slice(0, 10);
+    const name = admin ? `urgences-ziguinchor-${date}.json` : `mes-contacts-urgences-ziguinchor-${date}.json`;
+    const file = new File([JSON.stringify(list, null, 2)], name, { type: 'application/json' });
+    if (!admin && navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return list.length;
+      } catch (e) {
+        if ((e as Error).name === 'AbortError') return list.length;
+        // share failed — fall back to a download
+      }
+    }
+    const url = URL.createObjectURL(file);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `urgences-ziguinchor-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = name;
     a.click();
     URL.revokeObjectURL(url);
-  }, [contacts]);
+    return list.length;
+  }, [admin, contacts]);
 
-  /** Returns number of imported contacts; throws on invalid file. */
+  /**
+   * Returns number of imported contacts; throws on invalid file.
+   * Outside admin mode only personal contacts are imported, always merged.
+   */
   const importJson = useCallback(async (file: File, merge: boolean): Promise<number> => {
-    const parsed: unknown = JSON.parse(await file.text());
-    if (!Array.isArray(parsed) || !parsed.every(isContact)) throw new Error('invalid');
+    const raw: unknown = JSON.parse(await file.text());
+    if (!Array.isArray(raw) || !raw.every(isContact)) throw new Error('invalid');
+    const parsed = admin ? raw : raw.filter((c) => !isOfficial(c));
+    if (!admin) merge = true;
+    if (parsed.some((c) => !isOfficial(c))) void navigator.storage?.persist?.().catch(() => false);
     setContacts((prev) => {
       if (!merge) return parsed;
       const byId = new Map(prev.map((c) => [c.id, c]));
@@ -93,7 +132,7 @@ export function useContacts() {
       return [...byId.values()];
     });
     return parsed.length;
-  }, []);
+  }, [admin]);
 
   return { contacts, save, remove, reset, exportJson, importJson };
 }
