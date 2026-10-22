@@ -78,7 +78,8 @@ Pour régénérer les icônes après modification de `public/icon.svg` : `npm ru
 * Chaque contact peut contenir des numéros secondaires et des **services (départements)** avec téléphone, poste, interlocuteur et description.
 * `phoneRaw` est calculé automatiquement à partir de `phone` (`toPhoneRaw`).
 * Le champ `verified` signale les numéros confirmés ; sinon la carte affiche « Non vérifié ».
-* Menu « Données » : **export JSON** (sauvegarde / partage entre appareils), **import JSON** (fusion par `id` ou remplacement complet), **restauration** des données d'origine.
+* Menu « Données », **mode gestion** : **export JSON** de tous les contacts, **import JSON** (fusion par `id` ou remplacement complet), **restauration** des données d'origine. **Utilisateurs normaux** : « Sauvegarder mes contacts » (contacts personnels seulement, via le menu de partage du téléphone si disponible, sinon téléchargement) et « Importer mes contacts » (fusion, les contacts officiels du fichier sont ignorés).
+* Dès qu’un contact personnel est enregistré ou importé, l’app demande au navigateur un stockage persistant (`navigator.storage.persist()`) pour éviter l’effacement automatique.
 * Les données sont propres à chaque appareil et navigateur. Pour diffuser une liste mise à jour à tous les utilisateurs, intégrer le JSON exporté dans `src/data/contacts.ts` (avec des `id` lisibles) et redéployer.
 
 * **Domaines de soins (tags)** : en plus de sa catégorie, un contact peut porter des tags (`tags`, définis dans `src/data/tags.ts`, type `TagId`). Ils s’affichent en badge rose sur la carte, se cochent dans le formulaire et forment une ligne de filtres « Soins » sous les catégories. Tags actuels : Maternité, Pédiatrie, Vaccination, Paludisme / Fièvre. Pour ajouter un tag : l’ajouter à `TagId` et à `TAGS`. Un tag ajouté dans le seed arrive chez tous les utilisateurs (sauf sur un appareil en mode gestion).
