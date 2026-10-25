@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "icons": "pwa-assets-generator"
+    "icons": "pwa-assets-generator && node scripts/flatten-icons.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.59.0",

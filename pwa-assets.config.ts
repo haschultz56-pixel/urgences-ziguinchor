@@ -1,7 +1,8 @@
 import { defineConfig, minimal2023Preset } from '@vite-pwa/assets-generator/config';
 
-// public/icon.svg is round on a transparent background. Maskable (Android) and Apple icons are filled
-// edge to edge in red, so the launcher's own mask (circle, squircle…) never shows a white border.
+// public/icon.svg is round on a transparent background. Every PNG icon (standard, maskable, Apple) is filled
+// edge to edge in red (pwa-*.png by scripts/flatten-icons.mjs, since the generator keeps them transparent),
+// so no launcher (Chrome, Samsung Internet, One UI frames…) shows a white border.
 const fill = { padding: 0, resizeOptions: { background: '#b91c1c' } };
 
 export default defineConfig({

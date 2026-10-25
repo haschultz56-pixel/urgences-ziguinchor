@@ -42,7 +42,7 @@ Ce fichier sert de référence complète et d'instructions directes pour **Claud
 │   ├── icon.svg                  # Icône source, ronde (bouclier secours rouge/or)
 │   ├── favicon.ico
 │   ├── apple-touch-icon.png      # 180x180 pour iOS Safari
-│   ├── pwa-64x64.png / pwa-192x192.png / pwa-512x512.png
+│   ├── pwa-64x64.png / pwa-192x192.png / pwa-512x512.png # rouges jusqu’au bord
 │   └── maskable-icon-512x512.png # Icône masquable Android, rouge jusqu’au bord (aucun fond blanc)
 └── src/
     ├── main.tsx                  # Montage React + enregistrement du Service Worker
@@ -66,7 +66,7 @@ Ce fichier sert de référence complète et d'instructions directes pour **Claud
         └── ReportNumberDialog.tsx # Signalement d’un numéro erroné par WhatsApp
 ```
 
-Pour régénérer les icônes après modification de `public/icon.svg` : `npm run icons`, puis renommer `apple-touch-icon-180x180.png` en `apple-touch-icon.png`.
+Pour régénérer les icônes après modification de `public/icon.svg` : `npm run icons` (le script `scripts/flatten-icons.mjs` remplit ensuite en rouge les coins transparents des `pwa-*.png` et renomme `apple-touch-icon-180x180.png` en `apple-touch-icon.png`). Toutes les icônes PNG sont rouges jusqu’au bord, sans transparence, pour qu’aucun lanceur Android (Samsung compris) n’affiche de fond blanc.
 
 ---
 
