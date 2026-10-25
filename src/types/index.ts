@@ -44,9 +44,6 @@ export interface EmergencyContact {
   phone: string;
   phoneRaw: string;
   shortCode?: string;
-  /** Ligne directe du service d'urgence, affichée en second bouton d'appel */
-  emergencyPhone?: string;
-  emergencyPhoneRaw?: string;
   secondaryPhones?: SecondaryPhone[];
   isEmergency: boolean;
   is24_7: boolean;

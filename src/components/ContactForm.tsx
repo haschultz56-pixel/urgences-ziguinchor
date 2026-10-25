@@ -75,8 +75,6 @@ export function ContactForm({ t, initial, onSave, onClose }: Props) {
       phone: c.phone.trim(),
       phoneRaw: toPhoneRaw(c.phone),
       shortCode: c.shortCode?.trim() || undefined,
-      emergencyPhone: c.emergencyPhone?.trim() || undefined,
-      emergencyPhoneRaw: c.emergencyPhone?.trim() ? toPhoneRaw(c.emergencyPhone) : undefined,
       whatsapp: c.whatsapp?.trim() ? toPhoneRaw(c.whatsapp) : undefined,
       website: c.website?.trim() || undefined,
       contactPerson: c.contactPerson?.trim() || undefined,
@@ -132,9 +130,6 @@ export function ContactForm({ t, initial, onSave, onClose }: Props) {
           </Field>
           <Field label="Numéro court (ex. 18)">
             <input className={input} value={c.shortCode ?? ''} onChange={(e) => set('shortCode', e.target.value)} />
-          </Field>
-          <Field label="Téléphone du service d’urgence">
-            <input className={input} type="tel" inputMode="tel" placeholder="+221 77 ..." value={c.emergencyPhone ?? ''} onChange={(e) => set('emergencyPhone', e.target.value)} />
           </Field>
           <Field label="WhatsApp">
             <input className={input} type="tel" inputMode="tel" placeholder="+221 77 ..." value={c.whatsapp ?? ''} onChange={(e) => set('whatsapp', e.target.value)} />

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, Globe, House, MapPin, MessageCircle, MessageSquareWarning, Pencil, Phone, Siren, Trash2, User, UserRound, AlertTriangle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Globe, House, MapPin, MessageCircle, MessageSquareWarning, Pencil, Phone, Trash2, User, UserRound, AlertTriangle } from 'lucide-react';
 import type { EmergencyContact, Lang } from '../types';
 import type { Translations } from '../data/translations';
 import { categoryById } from '../data/categories';
@@ -142,15 +142,6 @@ export function ContactCard({ contact: c, lang, t, personal, canEdit, onEdit, on
           </a>
         )}
       </div>
-
-      {c.emergencyPhoneRaw && (
-        <a
-          href={`tel:${c.emergencyPhoneRaw}`}
-          className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 font-bold text-white active:bg-red-800"
-        >
-          <Siren size={18} /> {t.emergencyService} {c.emergencyPhone}
-        </a>
-      )}
 
       {c.secondaryPhones && c.secondaryPhones.length > 0 && (
         <ul className="mt-2 space-y-1">
