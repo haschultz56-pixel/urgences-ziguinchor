@@ -100,6 +100,8 @@ export interface EmergencyContact {
   phone: string;
   phoneRaw: string;
   shortCode?: string;
+  emergencyPhone?: string;    // ligne du service d'urgence, second bouton rouge
+  emergencyPhoneRaw?: string;
   secondaryPhones?: { labelFr: string; labelWo: string; phone: string; phoneRaw: string }[];
   isEmergency: boolean;
   is24_7: boolean;
@@ -139,6 +141,7 @@ export interface Department {
 Recherche web du 18/10/2026. **Tous les numéros restent « Non vérifié »** jusqu'à confirmation manuelle ; les sources et contradictions sont dans le champ `notes` de chaque contact (`src/data/contacts.ts`).
 
 1. **SAMU National** : 1515 (24h/24, gratuit)
+1b. **Service d’urgence Hôpital de la Paix** : +221 77 611 35 01 et **Service d’urgence Hôpital Régional** : +221 77 023 67 48 (catégorie « Urgences », **vérifiés**). Ces numéros figurent aussi dans le champ `emergencyPhone` des fiches des deux hôpitaux, affiché en second bouton rouge « Service d’urgence » sous « Appeler ».
 2. **Hôpital de la Paix** (Avenue Djignabo, Néma 2) : +221 33 991 98 00, avec ses services (urgences, pédiatrie & néonatologie, maternité, chirurgie, cardiologie, anesthésie-réanimation, maladies infectieuses, dermatologie, laboratoire & banque de sang)
 3. **Hôpital Régional / CHR**, dit « Hôpital Silence » : +221 33 991 11 54 / 33 991 12 75 / 33 991 10 12
 3b. **Hôpital Militaire / CMIA** (Camp militaire Georges Boissy, cité Somivat) : aucun numéro (garnison : 33 991 18 36)
