@@ -39,11 +39,11 @@ Ce fichier sert de référence complète et d'instructions directes pour **Claud
 ├── eslint.config.js              # ESLint (typescript-eslint, react-hooks)
 ├── pwa-assets.config.ts          # Génération des icônes à partir de public/icon.svg
 ├── public/
-│   ├── icon.svg                  # Icône source, ronde (bouclier secours rouge/or)
+│   ├── icon.svg                  # Icône source : bouclier rouge/or seul, fond transparent
 │   ├── favicon.ico
 │   ├── apple-touch-icon.png      # 180x180 pour iOS Safari
-│   ├── pwa-64x64.png / pwa-192x192.png / pwa-512x512.png # rouges jusqu’au bord
-│   └── maskable-icon-512x512.png # Icône masquable Android, rouge jusqu’au bord (aucun fond blanc)
+│   ├── pwa-64x64.png / pwa-192x192.png / pwa-512x512.png # fond blanc
+│   └── maskable-icon-512x512.png # Icône masquable Android, fond blanc
 └── src/
     ├── main.tsx                  # Montage React + enregistrement du Service Worker
     ├── index.css                 # Import global Tailwind CSS
@@ -66,7 +66,7 @@ Ce fichier sert de référence complète et d'instructions directes pour **Claud
         └── ReportNumberDialog.tsx # Signalement d’un numéro erroné par WhatsApp
 ```
 
-Pour régénérer les icônes après modification de `public/icon.svg` : `npm run icons` (le script `scripts/flatten-icons.mjs` remplit ensuite en rouge les coins transparents des `pwa-*.png` et renomme `apple-touch-icon-180x180.png` en `apple-touch-icon.png`). Toutes les icônes PNG sont rouges jusqu’au bord, sans transparence, pour qu’aucun lanceur Android (Samsung compris) n’affiche de fond blanc.
+Pour régénérer les icônes après modification de `public/icon.svg` : `npm run icons` (le script `scripts/flatten-icons.mjs` remplit ensuite en blanc le fond transparent des `pwa-*.png` et renomme `apple-touch-icon-180x180.png` en `apple-touch-icon.png`). Toutes les icônes PNG ont un fond blanc : les lanceurs Samsung posent l’icône sur un ovale blanc (même installée via Chrome), un fond rouge y laissait dépasser du blanc.
 
 ---
 
