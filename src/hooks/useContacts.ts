@@ -10,10 +10,26 @@ const SEED_IDS = new Set(DEFAULT_CONTACTS.map((c) => c.id));
 /** Official contacts come from the seed; all others are the user's own, kept on this device only. */
 export const isOfficial = (c: EmergencyContact): boolean => SEED_IDS.has(c.id);
 
-/** Appends seed contacts added since the last visit; seeds the user deleted are not restored. */
-function withNewSeeds(stored: EmergencyContact[]): EmergencyContact[] {
+/** Ids once in the seed and since removed, for devices that no longer remember having seen them. */
+const RETIRED_SEED_IDS = ['urgence-hopital-paix', 'urgence-hopital-regional'];
+
+/** Seed ids seen on this device before this visit, plus retired ones (null if unknown). */
+function readSeenSeeds(): Set<string> | null {
   const seenRaw = localStorage.getItem(SEEN_SEED_KEY);
-  const seen = new Set<string>(seenRaw ? JSON.parse(seenRaw) : stored.map((c) => c.id));
+  return seenRaw ? new Set<string>([...JSON.parse(seenRaw), ...RETIRED_SEED_IDS]) : null;
+}
+
+/**
+ * Drops contacts that were official on an earlier visit but have since been removed from the seed,
+ * so they don't linger as personal contacts. Personal contacts have random ids, never seed ids.
+ */
+function withoutRetiredSeeds(stored: EmergencyContact[], seen: Set<string> | null): EmergencyContact[] {
+  return seen ? stored.filter((c) => isOfficial(c) || !seen.has(c.id)) : stored;
+}
+
+/** Appends seed contacts added since the last visit; seeds the user deleted are not restored. */
+function withNewSeeds(stored: EmergencyContact[], seenBefore: Set<string> | null): EmergencyContact[] {
+  const seen = seenBefore ?? new Set(stored.map((c) => c.id));
   const added = DEFAULT_CONTACTS.filter((c) => !seen.has(c.id) && !stored.some((s) => s.id === c.id));
   localStorage.setItem(SEEN_SEED_KEY, JSON.stringify(DEFAULT_CONTACTS.map((c) => c.id)));
   return added.length ? [...stored, ...structuredClone(added)] : stored;
@@ -29,9 +45,11 @@ function load(admin: boolean): EmergencyContact[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        if (admin) return withNewSeeds(parsed);
+        const seen = readSeenSeeds();
+        const stored = withoutRetiredSeeds(parsed, seen);
+        if (admin) return withNewSeeds(stored, seen);
         localStorage.setItem(SEEN_SEED_KEY, JSON.stringify([...SEED_IDS]));
-        return [...structuredClone(DEFAULT_CONTACTS), ...parsed.filter((c: EmergencyContact) => !isOfficial(c))];
+        return [...structuredClone(DEFAULT_CONTACTS), ...stored.filter((c) => !isOfficial(c))];
       }
     }
     localStorage.setItem(SEEN_SEED_KEY, JSON.stringify(DEFAULT_CONTACTS.map((c) => c.id)));
